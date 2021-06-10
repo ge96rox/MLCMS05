@@ -24,7 +24,7 @@ def approx_nonlinear_func(x,fx,L,e):
     epsilon = e * np.max(dist)
     phi_l = np.exp(-dist**2/epsilon**2)
     
-    C,residues,_,_ = np.linalg.lstsq(phi_l, fx, rcond=None)
+    C,residues,_,_ = np.linalg.lstsq(phi_l, fx, rcond=50000)
     
     
     return C,residues,epsilon,x_l
