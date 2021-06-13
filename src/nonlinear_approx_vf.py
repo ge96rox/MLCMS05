@@ -1,5 +1,5 @@
 import numpy as np
-
+from src.nonlinear_approx import approx_nonlinear_func
 
 # rbf function
 def rbf(x, x_l, eps):
