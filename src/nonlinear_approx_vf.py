@@ -1,9 +1,11 @@
 import numpy as np
+from scipy.spatial.distance import cdist
 
 
 # rbf function
 def rbf(x, x_l, eps):
-    return np.exp(-np.sum((x_l - x) ** 2, axis=-1) / (eps ** 2))
+    #return np.exp(-np.sum((x_l - x) ** 2, axis=-1) / (eps ** 2))
+    return np.exp(-cdist(x,x_l) ** 2 / eps ** 2)
 
 
 # return random index
@@ -13,11 +15,15 @@ def rand_idx(x, nr_randpts):
 
 # return phi
 def get_phi(x0_data, nr_xl, id_xl, current_x_data, eps):
-    nr = x0_data.shape[0]
+    # nr = x0_data.shape[0]
+    nr = current_x_data.shape[0]
     phi = np.empty((nr, nr_xl))
+    '''
     for i in range(nr_xl):
         l = id_xl[i]
         phi[:, i] = rbf(current_x_data, x0_data[l], eps)
+    '''
+    phi = rbf(current_x_data, x0_data[id_xl], eps)
     return phi
 
 
