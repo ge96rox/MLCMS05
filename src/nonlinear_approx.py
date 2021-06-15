@@ -3,7 +3,23 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 
-def approx_nonlinear_func(x,fx,L,e):
+# rbf function
+def rbf(x, x_l, eps):
+    return np.exp(-cdist(x, x_l) ** 2 / eps ** 2)
+
+
+# return random index
+def rand_idx(x, nr_randpts):
+    return np.random.permutation(x.shape[0])[0:nr_randpts]
+
+
+# return phi
+def get_phi(x0_data, id_xl, current_x_data, eps):
+    phi = rbf(current_x_data, x0_data[id_xl], eps)
+    return phi
+
+
+def approx_nonlinear_func(x, fx, L, e):
     """
     Approximates a function using nonlinear radial functions as a basis.
 
@@ -14,46 +30,23 @@ def approx_nonlinear_func(x,fx,L,e):
     -------
    
     """
-   
+
     # choose L random elements of the data
-    rng = np.random.default_rng()
-    x_l = rng.choice(x,L)
-      
+    id_xl = rand_idx(x, L)
+
     # choose epsilon similar to diffusion map
-    dist = cdist(x,x_l)
+    dist = cdist(x, x[id_xl])
     epsilon = e * np.max(dist)
-    phi_l = np.exp(-dist**2/epsilon**2)
-    
-    C,res,_,_ = np.linalg.lstsq(phi_l, fx, rcond=50000)
-    
+    # phi_l = np.exp(-dist**2/epsilon**2)
+    phi = get_phi(x, id_xl, x, epsilon)
+
+    C, res, _, _ = np.linalg.lstsq(phi, fx, rcond=50000)
+
     def approximated_func(x_new):
-        dist_new = cdist(x_new,x_l)
-        phi_new = np.exp(-dist_new**2/epsilon**2)
-    
-        return phi_new@C
-    
+        dist_new = cdist(x_new, x[id_xl])
+        phi_new = np.exp(-dist_new ** 2 / epsilon ** 2)
 
-    
-    return approximated_func,C,res,epsilon
+        return phi_new @ C
 
-def find_best_eps(x,fx,L,e_list):
-    
-    r_list = np.zeros(len(e_list))
-    eps_list =[]
-    c_list = []
-    func_list = []
-    for i,e in enumerate(e_list):
+    return approximated_func, C, res, epsilon
 
-        approximated_func,C,res,epsilon = approx_nonlinear_func(x,fx,L,e)
-        r_list[i] = res[0] if res.size!= 0 else float("inf")
-        eps_list.append(epsilon)
-        c_list.append(C)
-        func_list.append(approximated_func)
-
-    print("Minimum Residual is :", min(r_list))
-    print("At e = " ,e_list[np.argmin(r_list)])
-
-    epsilon = eps_list[np.argmin(r_list)]
-    nonlinear_func = func_list[np.argmin(r_list)]
-            
-    return nonlinear_func, epsilon
