@@ -43,3 +43,19 @@ def pca(dataset, num_pc=-1):
     s_truncated[num_pc:, ] = 0
 
     return u, s, vh, s_truncated
+
+
+def arc_length_velocity(point_set):
+    
+    v_field = np.zeros((point_set.shape[0]-1,2))
+    list_length = []
+    delta_t = 1
+    
+    for i in range(point_set.shape[0]-1):
+        length = np.linalg.norm(point_set[i]-point_set[i+1])
+        list_length.append(length)
+        v_field[i,0] = sum(list_length)
+        v_field[i,1] = length / delta_t
+    
+    return v_field
+        
