@@ -23,8 +23,8 @@ def find_best_eps(x, fx, L, e_list):
     return nonlinear_func, epsilon
 
 
-def find_best_eps_linear_vf(x0_data, x1_data, approx_linear_func):
-    delta_t_list = np.arange(0.05, 0.15, 0.01)
+def find_best_eps_linear_vf(x0_data, x1_data, approx_linear_func,delta_t_list):
+    #delta_t_list = np.arange(0.05, 0.15, 0.01)
     mse_list = []
     a_list = []
 
@@ -62,7 +62,7 @@ def find_best_eps_nonlinear_vf(x0_data, nr_xl, delta_t, x1_data, v_data):
     id_xl = rand_idx(x0_data, nr_xl)
     for e in eps:
         phi = get_phi(x0_data, id_xl, x0_data, e)
-        C = np.linalg.lstsq(phi, v_data, rcond=None)[0]
+        C = np.linalg.lstsq(phi, v_data, rcond=1e16)[0]
         # x1_sol = np.zeros((x0_data.shape[0], 2))
         v_sol = phi @ C
         x1_sol = v_sol * delta_t + x0_data
