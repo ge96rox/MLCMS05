@@ -40,7 +40,7 @@ def approx_nonlinear_func(x, fx, L, e):
     # phi_l = np.exp(-dist**2/epsilon**2)
     phi = get_phi(x, id_xl, x, epsilon)
 
-    C, res, _, _ = np.linalg.lstsq(phi, fx, rcond=50000)
+    C, res, _, _ = np.linalg.lstsq(phi, fx, rcond=1e-16)
 
     def approximated_func(x_new):
         dist_new = cdist(x_new, x[id_xl])

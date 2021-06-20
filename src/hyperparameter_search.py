@@ -23,8 +23,8 @@ def find_best_eps(x, fx, L, e_list):
     return nonlinear_func, epsilon
 
 
-def find_best_eps_linear_vf(x0_data, x1_data, approx_linear_func):
-    delta_t_list = np.arange(0.05, 0.15, 0.01)
+def find_best_eps_linear_vf(x0_data, x1_data, approx_linear_func,delta_t_list):
+    #delta_t_list = np.arange(0.05, 0.15, 0.01)
     mse_list = []
     a_list = []
 
@@ -62,7 +62,7 @@ def find_best_eps_nonlinear_vf(x0_data, nr_xl, delta_t, x1_data, v_data):
     id_xl = rand_idx(x0_data, nr_xl)
     for e in eps:
         phi = get_phi(x0_data, id_xl, x0_data, e)
-        C = np.linalg.lstsq(phi, v_data, rcond=None)[0]
+        C = np.linalg.lstsq(phi, v_data, rcond=1e16)[0]
         # x1_sol = np.zeros((x0_data.shape[0], 2))
         v_sol = phi @ C
         x1_sol = v_sol * delta_t + x0_data
@@ -71,3 +71,27 @@ def find_best_eps_nonlinear_vf(x0_data, nr_xl, delta_t, x1_data, v_data):
             min_loss = loss
             min_esp = e
     return min_esp
+
+
+def find_best_l_nonlinear_vf(x0_data, x1_data, v_data, delta_t, nr):
+    idx_list = []
+    mse_list = []
+    for nr_xl in range(100, 1001, 100):
+
+        id_xl = rand_idx(x0_data, nr_xl)
+        min_esp = find_best_eps_nonlinear_vf(x0_data, nr_xl, delta_t, x1_data, v_data)
+        eps = 5.33
+        phi = get_phi(x0_data, id_xl, x0_data, eps)
+        C = np.linalg.lstsq(phi, v_data, rcond=None)[0]
+        x1_sol = np.zeros((nr, 2))
+        v_sol = phi @ C
+
+        # mse loss
+        eq = lambda t, x: get_phi(x0_data, id_xl, x.reshape((1, 2)), eps) @ C
+        x1_sol = np.zeros((nr, 2))
+        for i in range(nr):
+            x1_sol[i, :] = solve_ivp(eq, t_span=[0, 0.2], t_eval=[0.1], y0=x0_data[i, :]).y.reshape(-1)
+        idx_list.append(nr_xl)
+        mse = np.mean(np.sum((x1_sol - x1_data) ** 2, axis=-1))
+        mse_list.append(mse)
+    return idx_list, mse_list

@@ -16,7 +16,7 @@ def approx_linear_func(x,fx):
     """
    
        
-    A,res,_,_ = np.linalg.lstsq(x, fx, rcond=500000)
+    A,res,_,_ = np.linalg.lstsq(x, fx, rcond=1e-16)
 
     def approximated_func(x_new):
         return x_new@A
