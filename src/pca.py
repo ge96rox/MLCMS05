@@ -107,6 +107,7 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
         v_field_o[i,1] = np.average(v_field[i::one_round_size,1])
         arc_function_o[i,1] = np.average(arc_function[i::one_round_size,1])
      
+    # scaling so that time axis varies from 0-1 and has a Delta t of 1/one_round_size
     v_field_o[:,1] /= v_field[one_round_size,0] / one_round_size
     
     v_field_o[:,0] = np.linspace(0, 1, one_round_size)
@@ -116,8 +117,7 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
 
 
 def predict(num_days, v_field_o, arc_function_o):
-    
-     """predict future measurement
+    """predict future measurement
 
     Parameters
     ----------
@@ -129,13 +129,13 @@ def predict(num_days, v_field_o, arc_function_o):
         averaged sensor measurement function
     Returns
     -------
+    prediction_arc:
+        predicted arc length
     prediction_measurement:
         predicted measurement
-
-    """
-    
-    resolution = len(v_field_o)
+    """ 
     # arclength calculated with vector field
+    resolution = len(v_field_o)
     prediction_arc = np.zeros((resolution*num_days, 2))
     # predicted measurement
     prediction_measurement = np.zeros((resolution*num_days, 2))
@@ -155,5 +155,5 @@ def predict(num_days, v_field_o, arc_function_o):
     # find the value in measurement function according to the arclength
     prediction_measurement[:,1] = np.interp(prediction_arc[:,1], arc_function_tile[:,0], arc_function_tile[:,1])
         
-    return prediction_measurement
+    return prediction_arc, prediction_measurement
     
