@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cdist
 
 
 def pca(dataset, num_pc=-1):
@@ -82,14 +83,14 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
         arc_function[i,0] = v_field[i,0]
         arc_function[i,1] = measurement_set[delay+i,dim_index]
         
-    
+    '''
     # vector field in one round (?)
     one_round_size = int(np.around((pca_set.shape[0]+delay)/7))
     v_field_o = np.zeros((one_round_size,2))
     # sensor measurement function in one round (?)
     arc_function_o = np.zeros((one_round_size,2))
     
-    '''
+    
     # interpolate for equal arc length
     v_field_interp = np.zeros(v_field.shape)
     arc_function_interp = np.zeros(arc_function.shape)
@@ -98,7 +99,7 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
     arc_function_interp[:,1] = np.interp(interp, arc_function[:,0], arc_function[:,1])
     v_field_interp[:,0] = interp
     arc_function_interp[:,0] = interp
-    '''
+    
     
     for i in range(one_round_size):
         v_field_o[i,1] = np.average(v_field[i::one_round_size,1])
@@ -109,9 +110,39 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
     
     v_field_o[:,0] = np.linspace(0, 1, one_round_size)
     arc_function_o[:,0] = np.linspace(0, 1, one_round_size)
+    '''
     
+    return v_field, arc_function
+
+
+def rbf_sin(x, fx, L, e, p):
     
-    return v_field, arc_function, v_field_o, arc_function_o
+    def rbf(x, x_l, eps, p):
+        return np.exp(-np.abs(np.cos(cdist(x,x_l)/p))/eps)
+    
+    def rand_idx(x, nr_randpts):
+        return np.random.permutation(x.shape[0])[0:nr_randpts]
+    
+    def get_phi(x0_data, id_xl, current_x_data, eps, p):
+        phi = rbf(current_x_data, x0_data[id_xl], eps, p)
+        return phi
+    
+    def approximated_func(x_new):
+        dist_new = cdist(x_new, x[id_xl])
+        phi_new = np.exp(-np.abs(np.cos(dist_new/p))/epsilon)
+        return phi_new @ C
+    
+    # choose L random elements of the data
+    id_xl = rand_idx(x, L)
+
+    # choose epsilon similar to diffusion map
+    dist = cdist(x, x[id_xl])
+    epsilon = e * np.max(dist)
+    phi = get_phi(x, id_xl, x, epsilon, p)
+
+    C, res, _, _ = np.linalg.lstsq(phi, fx, rcond=1e-16)
+    
+    return approximated_func, C, res, epsilon
 
 
 def predict(num_days, v_field_o, arc_function_o):
@@ -154,4 +185,16 @@ def predict(num_days, v_field_o, arc_function_o):
     prediction_measurement[:,1] = np.interp(prediction_arc[:,1], arc_function_tile[:,0], arc_function_tile[:,1])
         
     return prediction_arc, prediction_measurement
+
+
+def rbf_predict(v_field, arc_function):
+
+    predict = np.zeros((28000,1))
+    predict_measurement = np.zeros((28000,1))
     
+    for i in range(28000-1):
+        predict[i+1,0] = predict[i,0] + v_field(predict[i,0].reshape((-1,1)))
+        
+    predict_measurement = arc_function(predict[:,0].reshape((-1,1)))
+    
+    return predict_measurement
