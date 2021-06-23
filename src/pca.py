@@ -65,10 +65,6 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
         vector field function
     arc_function:
         sensor measurement function
-    v_field_o:
-        averaged vector field function
-    arc_function:
-        averaged sensor measurement function
 
     """
     
@@ -86,6 +82,7 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
         arc_function[i,0] = v_field[i,0]
         arc_function[i,1] = measurement_set[delay+i,dim_index]
         
+    
     # vector field in one round (?)
     one_round_size = int(np.around((pca_set.shape[0]+delay)/7))
     v_field_o = np.zeros((one_round_size,2))
@@ -112,6 +109,7 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
     
     v_field_o[:,0] = np.linspace(0, 1, one_round_size)
     arc_function_o[:,0] = np.linspace(0, 1, one_round_size)
+    
     
     return v_field, arc_function, v_field_o, arc_function_o
 
