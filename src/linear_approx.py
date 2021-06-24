@@ -5,14 +5,22 @@ from scipy.spatial.distance import cdist
 
 def approx_linear_func(x,fx):
     """
-    Approximates a function using using np.linalg.lstsq 
+    Approximates a function using np.linalg.lstsq
 
     Parameters
     ----------
-   
+    x: np.ndarray
+        source data
+    fx: np.ndarray
+        target data
     Returns
     -------
-   
+    approximated_func:
+        function closure that can be used to approximate
+    A:
+        matrix C
+    res:
+       residual from lstsq method
     """
    
        

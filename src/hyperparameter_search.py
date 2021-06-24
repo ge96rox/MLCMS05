@@ -2,7 +2,27 @@ import numpy as np
 from src.nonlinear_approx import rand_idx, get_phi, approx_nonlinear_func
 from scipy.integrate import solve_ivp
 
+
 def find_best_eps(x, fx, L, e_list):
+    """function returns epsilon with minimal mse loss for function approximation
+
+    Parameters
+    ----------
+    x: np.ndarray
+        source data
+    fa: np.ndarray
+        target data
+    L: int
+        hyperparameter L in RBF kernel
+    e_list: list
+        list of epsilon
+    Returns
+    -------
+    nonlinear_func:
+        best nonlinear function to approximate
+    epsilon:
+        best epsilon with minimal mse loss
+    """
     r_list = np.zeros(len(e_list))
     eps_list = []
     c_list = []
@@ -24,7 +44,29 @@ def find_best_eps(x, fx, L, e_list):
 
 
 def find_best_eps_linear_vf(x0_data, x1_data, approx_linear_func,delta_t_list):
-    #delta_t_list = np.arange(0.05, 0.15, 0.01)
+    """function returns epsilon with minimal mse loss for linear vector field approximation
+
+    Parameters
+    ----------
+    x0_data: np.ndarray
+        source data
+    x1_data: np.ndarray
+        target data
+    approx_linear_func: int
+        linear function to approximating vector field
+    delta_t_list: list
+        list of delta t
+    Returns
+    -------
+    mse_list:
+        list of mese loss
+    a_list:
+        list of A matrix
+    min_delta_t:
+        list of delta_t with minimal mse loss
+    A:
+        best A for approximating
+    """
     mse_list = []
     a_list = []
 
@@ -56,6 +98,25 @@ def find_best_eps_linear_vf(x0_data, x1_data, approx_linear_func,delta_t_list):
 
 
 def find_best_eps_nonlinear_vf(x0_data, nr_xl, delta_t, x1_data, v_data):
+    """function returns epsilon with minimal mse loss for non linear vector field approximation
+
+    Parameters
+    ----------
+    x0_data: np.ndarray
+        source position data
+    x1_data: np.ndarray
+        target position data
+    nr_xl: np.ndarray
+        number of random selected index
+    delta_t: list
+        list of delta t
+    v_data:
+        taget vector field dataset
+    Returns
+    -------
+    min_esp:
+        best esp with minimal mse loss
+    """
     min_loss = np.inf
     min_esp = 0
     eps = np.linspace(0.1, 20, 20)
@@ -74,6 +135,27 @@ def find_best_eps_nonlinear_vf(x0_data, nr_xl, delta_t, x1_data, v_data):
 
 
 def find_best_l_nonlinear_vf(x0_data, x1_data, v_data, delta_t, nr):
+    """function returns L with minimal mse loss for non linear vector field approximation
+
+    Parameters
+    ----------
+    x0_data: np.ndarray
+        source position data
+    x1_data: np.ndarray
+        target position data
+    v_data:
+        taget vector field dataset
+    delta_t: list
+        list of delta t
+    nr: int
+        number of random selected index
+    Returns
+    -------
+    idx_list:
+        list of index
+    mse_list:
+        list of mse loss
+    """
     idx_list = []
     mse_list = []
     for nr_xl in range(100, 1001, 100):

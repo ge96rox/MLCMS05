@@ -6,6 +6,16 @@ import matplotlib.pyplot as plt
 
 
 def plot_time_delay(x0, delta_n):
+    """
+    plot time delay embedding figure in 2D
+
+    Parameters
+    ----------
+    x0 : np.ndarray
+        data
+    delta_n : int
+        step for time delay
+    """
     plt.figure(figsize=(5, 5))
     points_len = x0.shape[0]
     # shift the data
@@ -19,6 +29,16 @@ def plot_time_delay(x0, delta_n):
 
 
 def plot_time_delay_3d(x0, delta_n):
+    """
+    plot time delay embedding figure in 3D
+
+    Parameters
+    ----------
+    x0 : np.ndarray
+        data
+    delta_n : int
+        step for time delay
+    """
     plt.figure(figsize=(5, 5))
     points_len = x0.shape[0]
     # shift the data

@@ -82,36 +82,7 @@ def arc_length_velocity(pca_set, measurement_set, dim_index, delay):
         v_field[i,1] = length
         arc_function[i,0] = v_field[i,0]
         arc_function[i,1] = measurement_set[delay+i,dim_index]
-        
-    '''
-    # vector field in one round (?)
-    one_round_size = int(np.around((pca_set.shape[0]+delay)/7))
-    v_field_o = np.zeros((one_round_size,2))
-    # sensor measurement function in one round (?)
-    arc_function_o = np.zeros((one_round_size,2))
-    
-    
-    # interpolate for equal arc length
-    v_field_interp = np.zeros(v_field.shape)
-    arc_function_interp = np.zeros(arc_function.shape)
-    interp = np.linspace(v_field[0,0], v_field[-1,0], pca_set.shape[0]-1)
-    v_field_interp[:,1] = np.interp(interp, v_field[:,0], v_field[:,1])
-    arc_function_interp[:,1] = np.interp(interp, arc_function[:,0], arc_function[:,1])
-    v_field_interp[:,0] = interp
-    arc_function_interp[:,0] = interp
-    
-    
-    for i in range(one_round_size):
-        v_field_o[i,1] = np.average(v_field[i::one_round_size,1])
-        arc_function_o[i,1] = np.average(arc_function[i::one_round_size,1])
-     
-    # scaling so that time axis varies from 0-1 and has a Delta t of 1/one_round_size
-    v_field_o[:,1] /= v_field[one_round_size,0] / one_round_size
-    
-    v_field_o[:,0] = np.linspace(0, 1, one_round_size)
-    arc_function_o[:,0] = np.linspace(0, 1, one_round_size)
-    '''
-    
+          
     return v_field, arc_function
 
 
